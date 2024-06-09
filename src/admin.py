@@ -1,4 +1,5 @@
 from datetime import datetime
+import uuid
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required
 import src.constants.http_status_codes as http
 from flask import Blueprint, jsonify, request
@@ -44,8 +45,10 @@ def register():
         return jsonify({"msg": "Username already exists"}), http.HTTP_409_CONFLICT
 
     created_at = datetime.now().timestamp() * 1000
+    new_id = str(uuid.uuid4())
     
     new_admin = Admin(
+        id=new_id,
         username=username,
         password=generate_password_hash(password),
         created_at=created_at,
@@ -79,3 +82,22 @@ def change_password():
             return jsonify({"msg": "Password changed successfully"}), http.HTTP_200_OK
 
     return jsonify({"msg": "Invalid current password"}), http.HTTP_401_UNAUTHORIZED
+
+# a function that will create one default admin and will be called when the app is first run
+def create_default_admin():
+    admin = Admin.query.filter_by(username="admin").first()
+    if not admin:
+        created_at = datetime.now().timestamp() * 1000
+        new_id = str(uuid.uuid4())
+        new_admin = Admin(
+            id=new_id,
+            username="admin",
+            password=generate_password_hash("admin", method='pbkdf2'),
+            created_at=created_at,
+            updated_at=created_at
+        )
+        db.session.add(new_admin)
+        db.session.commit()
+        print("Default admin created successfully")
+    else:
+        print("Default admin already exists")

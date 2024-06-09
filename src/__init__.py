@@ -5,7 +5,7 @@ from flasgger import Swagger
 from src.constants.http_status_codes import HTTP_404_NOT_FOUND, HTTP_500_INTERNAL_SERVER_ERROR
 from src.database import db
 from flask_migrate import Migrate
-from src.admin import admin
+from src.admin import admin, create_default_admin
 
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
@@ -35,6 +35,9 @@ def create_app(test_config=None):
     app.register_blueprint(admin, url_prefix='/api/v1/admin')
 
     # Swagger(app, template=template, config=swagger_config)
+
+    with app.app_context():
+        create_default_admin()
 
     @app.errorhandler(HTTP_404_NOT_FOUND)
     def handle_404(e):
