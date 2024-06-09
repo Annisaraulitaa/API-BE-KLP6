@@ -34,6 +34,8 @@ class User(db.Model):
     photo_url = db.Column(db.String(100), unique=True, nullable=False)
     role_id = db.Column(db.Text(), nullable=True)
     role_text = db.Column(db.String(100), nullable=True)
+    # add foreign key 'created_by' to Admin
+    created_by = db.Column(db.Text(), db.ForeignKey('admin.id'), nullable=False)
     updated_at = db.Column(db.Float, nullable=False)
     created_at = db.Column(db.Float, nullable=False)
 
@@ -60,6 +62,7 @@ class News(db.Model):
     title = db.Column(db.String(100), unique=True, nullable=False)
     content = db.Column(db.Text(), nullable=False)
     photo_url = db.Column(db.String(100), unique=True, nullable=False)
+    created_by = db.Column(db.Text(), db.ForeignKey('admin.id'), nullable=False)
     updated_at = db.Column(db.Float, nullable=False)
     created_at = db.Column(db.Float, nullable=False)
 
@@ -82,6 +85,7 @@ class Event(db.Model):
     title = db.Column(db.String(100), unique=True, nullable=False)
     content = db.Column(db.Text(), nullable=False)
     photo_url = db.Column(db.String(100), unique=True, nullable=False)
+    created_by = db.Column(db.Text(), db.ForeignKey('admin.id'), nullable=False)
     updated_at = db.Column(db.Float, nullable=False)
     created_at = db.Column(db.Float, nullable=False)
 
@@ -129,6 +133,7 @@ class Achievement(db.Model):
     content: str = db.Column(db.Text(), nullable=False)
     year = db.Column(db.Integer, nullable=False)
     photo_url: str = db.Column(db.String(100), unique=True, nullable=False)
+    created_by: str = db.Column(db.Text(), db.ForeignKey('admin.id'), nullable=False)
     updated_at: float = db.Column(db.Float, nullable=False)
     created_at: float = db.Column(db.Float, nullable=False)
 
