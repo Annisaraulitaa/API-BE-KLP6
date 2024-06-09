@@ -1,0 +1,25 @@
+# Ignore virtual environment
+venv/
+
+# Ignore Python bytecode files
+*.pyc
+
+# Ignore Flask cache and log files
+__pycache__/
+*.log
+
+# Ignore local configuration files
+instance/config.py
+
+# Ignore static files build directory
+static/build/
+
+# Ignore IDE or editor configuration files
+.vscode/
+.idea/
+
+# firebase json
+key.json
+
+# env
+.flaskenv
