@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required
-import constants.http_status_codes as http
+import src.constants.http_status_codes as http
 from flask import Blueprint, jsonify, request
 from src.database import db, Admin
 from werkzeug.security import check_password_hash, generate_password_hash
