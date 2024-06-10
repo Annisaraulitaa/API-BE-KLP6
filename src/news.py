@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import List
 import uuid
 
 from flask_jwt_extended import get_jwt_identity, jwt_required
