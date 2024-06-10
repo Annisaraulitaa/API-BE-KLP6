@@ -5,6 +5,7 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 import src.constants.http_status_codes as http
 from flask import Blueprint, jsonify, request
 from src.database import News, db
+from src.utils.delete_image_from_firebase import delete_image_from_firebase
 from src.utils.upload_image_to_firebase import upload_image_to_firebase
 
 news = Blueprint('news', __name__)
@@ -14,7 +15,7 @@ def get_news():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
     
-    pagination = News.query.paginate(page, per_page, False)
+    pagination = News.query.paginate(page=page, per_page=per_page, error_out=False)
     news_items = pagination.items
     
     return jsonify({
@@ -36,13 +37,13 @@ def get_news_by_id(news_id):
     
     return jsonify({"msg": "News not found"}), http.HTTP_404_NOT_FOUND
 
-@news.post('/create')
+@news.post('/')
 @jwt_required()
 def create_news():
     created_by = get_jwt_identity()
     title = request.form.get('title', None)
     content = request.form.get('content', None)
-    photo = request.form.get('photo', None)
+    photo = request.files.get('photo', None)
     
     if not title or not content or not photo:
         return jsonify({"msg": "Title, content, and photo are required"}), http.HTTP_400_BAD_REQUEST
@@ -74,7 +75,7 @@ def create_news():
         "data": news.to_dict()
     }), http.HTTP_201_CREATED
 
-@news.put('/update/<news_id>')
+@news.put('/<news_id>')
 @jwt_required()
 def update_news(news_id):
     title = request.form.get('title', None)
@@ -107,12 +108,17 @@ def update_news(news_id):
     
     return jsonify({"msg": "News not found"}), http.HTTP_404_NOT_FOUND
 
-@news.delete('/delete/<news_id>')
+@news.delete('/<news_id>')
 @jwt_required()
 def delete_news(news_id):
     news: News = News.query.get(news_id)
     
     if news:
+        delete = delete_image_from_firebase(news.photo_url)
+
+        if not delete[0]:
+            return jsonify({"msg": delete[1]}), http.HTTP_500_INTERNAL_SERVER_ERROR
+        
         db.session.delete(news)
         db.session.commit()
         

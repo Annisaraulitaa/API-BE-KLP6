@@ -1,6 +1,7 @@
 from datetime import datetime
 import uuid
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from src.database import Event, db
 import src.constants.http_status_codes as http
 from src.utils.upload_image_to_firebase import upload_image_to_firebase
@@ -24,14 +25,15 @@ def get_by_id(id):
     
     return jsonify(event.to_dict()), http.HTTP_200_OK
 
-@event.post('/create')
+@event.post('/')
+@jwt_required()
 def create():
     title = request.form.get('title', None)
     content = request.form.get('content', None)
-    photo = request.form.get('photo', None)
-    created_by = request.form.get('created_by', None)
+    photo = request.files.get('photo', None)
+    created_by = get_jwt_identity()
     
-    if not title or not content or not photo or not created_by:
+    if not title or not content or not photo:
         return jsonify({"msg": "All fields must be provided"}), http.HTTP_400_BAD_REQUEST
     
     new_id = str(uuid.uuid4())
@@ -47,7 +49,7 @@ def create():
         id=new_id,
         title=title,
         content=content,
-        photo_url=photo_url,
+        photo_url=photo_url[0],
         created_by=created_by,
         updated_at=created_at,
         created_at=created_at
@@ -58,7 +60,7 @@ def create():
     
     return jsonify(event.to_dict()), http.HTTP_201_CREATED
 
-@event.put('/update/<id>')
+@event.put('/<id>')
 def update(id):
     title = request.form.get('title', None)
     content = request.form.get('content', None)
@@ -88,7 +90,7 @@ def update(id):
     
     return jsonify(event.to_dict()), http.HTTP_200_OK
 
-@event.delete('/delete/<id>')
+@event.delete('/<id>')
 def delete(id):
     event: Event = Event.query.get(id)
     

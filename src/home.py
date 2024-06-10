@@ -21,8 +21,9 @@ def get_home():
     achievement_count = len(achievement_country)
     # create count for every different country
     country_count = len(set([ac.country for ac in achievement_country]))
-
-    user_count: List[User] = User.query.filter(User.role_id != None).all().count()
+    # count how many users are there
+    user_count = User.query.count()
+    # user_count: List[User] = User.query.all()
 
     return jsonify({
         "gallery": gallery_data,

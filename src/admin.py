@@ -6,6 +6,7 @@ from flask import Blueprint, jsonify, request
 from src.database import User, db, Admin
 from werkzeug.security import check_password_hash, generate_password_hash
 
+from src.utils.delete_image_from_firebase import delete_image_from_firebase
 from src.utils.upload_image_to_firebase import upload_image_to_firebase
 
 admin = Blueprint('admin', __name__)
@@ -111,6 +112,9 @@ def create_user():
                 'msg': photo_url[1]
             }), http.HTTP_500_INTERNAL_SERVER_ERROR
     
+    if role_id:
+        role_id = int(role_id)
+    
     admin_id = get_jwt_identity()
     admin: Admin = Admin.query.get(admin_id)
 
@@ -124,7 +128,7 @@ def create_user():
             phone=phone,
             address=address,
             photo_url=photo_url[0],
-            role_id=int(role_id),
+            role_id=role_id,
             role_text=role_text,
             created_by=admin.id,
             updated_at=created_at,
@@ -189,6 +193,12 @@ def delete_user(user_id):
     user: User = User.query.get(user_id)
 
     if user:
+        if user.photo_url:
+            delete = delete_image_from_firebase(user.photo_url)
+
+            if not delete[0]:
+                return jsonify({"msg": delete[1]}), http.HTTP_500_INTERNAL_SERVER_ERROR
+
         db.session.delete(user)
         db.session.commit()
 

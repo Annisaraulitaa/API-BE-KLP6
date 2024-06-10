@@ -4,6 +4,7 @@ from flask import Blueprint, json, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from src.database import Gallery, db
 import src.constants.http_status_codes as http
+from src.utils.delete_image_from_firebase import delete_image_from_firebase
 from src.utils.upload_image_to_firebase import upload_image_to_firebase
 
 gallery = Blueprint('gallery', __name__)
@@ -13,7 +14,7 @@ def get_gallery():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
     
-    pagination = Gallery.query.paginate(page, per_page, False)
+    pagination = Gallery.query.paginate(page=page, per_page=per_page, error_out=False)
     gallery_items = pagination.items
     
     return jsonify({
@@ -35,12 +36,12 @@ def get_gallery_by_id(gallery_id):
     
     return jsonify({"msg": "Gallery not found"}), http.HTTP_404_NOT_FOUND
 
-@gallery.post('/create')
+@gallery.post('/')
 @jwt_required()
 def create_gallery():
     created_by = get_jwt_identity()
     title = request.form.get('title', None)
-    photo = request.form.get('photo', None)
+    photo = request.files.get('photo', None)
     
     if not title or not photo:
         return jsonify({"msg": "Title and photo are required"}), http.HTTP_400_BAD_REQUEST
@@ -57,7 +58,7 @@ def create_gallery():
     gallery = Gallery(
         id=new_id,
         title=title,
-        photo_url=photo_url,
+        photo_url=photo_url[0],
         created_by=created_by,
         updated_at=created_at,
         created_at=created_at
@@ -71,11 +72,11 @@ def create_gallery():
         "data": gallery.to_dict()
     }), http.HTTP_201_CREATED
 
-@gallery.put('/update/<gallery_id>')
+@gallery.put('/<gallery_id>')
 @jwt_required()
 def update_gallery(gallery_id):
     title = request.form.get('title', None)
-    photo = request.form.get('photo', None)
+    photo = request.files.get('photo', None)
     
     gallery: Gallery = Gallery.query.get(gallery_id)
     
@@ -101,12 +102,17 @@ def update_gallery(gallery_id):
     
     return jsonify({"msg": "Gallery not found"}), http.HTTP_404_NOT_FOUND
 
-@gallery.delete('/delete/<gallery_id>')
+@gallery.delete('/<gallery_id>')
 @jwt_required()
 def delete_gallery(gallery_id):
     gallery: Gallery = Gallery.query.get(gallery_id)
     
     if gallery:
+        delete = delete_image_from_firebase(gallery.photo_url)
+
+        if not delete[0]:
+            return jsonify({"msg": delete[1]}), http.HTTP_500_INTERNAL_SERVER_ERROR
+        
         db.session.delete(gallery)
         db.session.commit()
         

@@ -17,7 +17,7 @@ def login():
     if not username or not password:
         return jsonify({"msg": "Username and password must be provided"}), http.HTTP_400_BAD_REQUEST
     
-    user: User = User.query.filter_by(username=username).first()
+    user: User = User.query.filter_by(name=username).first()
 
     if user:
         if check_password_hash(user.password, password):
@@ -47,7 +47,7 @@ def update():
     email = request.form.get('email', None)
     phone = request.form.get('phone', None)
     address = request.form.get('address', None)
-    photo = request.form.get('photo', None)
+    photo = request.files.get('photo', None)
     
     if name:
         user.name = name

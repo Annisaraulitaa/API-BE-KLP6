@@ -26,13 +26,13 @@ class Admin(db.Model):
 @dataclass
 class User(db.Model):
     id = db.Column(db.Text(), primary_key=True)
-    name = db.Column(db.String(100), unique=True, nullable=False)
+    name = db.Column(db.String(100), nullable=False)
     password = db.Column(db.Text(), nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    phone = db.Column(db.String(100), unique=True, nullable=False)
-    address = db.Column(db.String(100), unique=True, nullable=False)
-    photo_url = db.Column(db.String(100), unique=True, nullable=True)
-    role_id = db.Column(db.Text(), nullable=True)
+    email = db.Column(db.String(100), nullable=False)
+    phone = db.Column(db.String(100), nullable=False)
+    address = db.Column(db.String(100), nullable=False)
+    photo_url = db.Column(db.String(100), nullable=True)
+    role_id = db.Column(db.Integer, nullable=True)
     role_text = db.Column(db.String(100), nullable=True)
     # add foreign key 'created_by' to Admin
     created_by = db.Column(db.Text(), db.ForeignKey('admin.id'), nullable=False)
@@ -59,9 +59,9 @@ class User(db.Model):
 @dataclass
 class News(db.Model):
     id = db.Column(db.Text(), primary_key=True)
-    title = db.Column(db.String(100), unique=True, nullable=False)
+    title = db.Column(db.String(100), nullable=False)
     content = db.Column(db.Text(), nullable=False)
-    photo_url = db.Column(db.String(100), unique=True, nullable=False)
+    photo_url = db.Column(db.String(100), nullable=False)
     created_by = db.Column(db.Text(), db.ForeignKey('admin.id'), nullable=False)
     updated_at = db.Column(db.Float, nullable=False)
     created_at = db.Column(db.Float, nullable=False)
@@ -82,9 +82,9 @@ class News(db.Model):
 @dataclass
 class Event(db.Model):
     id = db.Column(db.Text(), primary_key=True)
-    title = db.Column(db.String(100), unique=True, nullable=False)
+    title = db.Column(db.String(100), nullable=False)
     content = db.Column(db.Text(), nullable=False)
-    photo_url = db.Column(db.String(100), unique=True, nullable=False)
+    photo_url = db.Column(db.String(100), nullable=False)
     created_by = db.Column(db.Text(), db.ForeignKey('admin.id'), nullable=False)
     updated_at = db.Column(db.Float, nullable=False)
     created_at = db.Column(db.Float, nullable=False)
@@ -105,8 +105,8 @@ class Event(db.Model):
 @dataclass
 class AchievementCountry(db.Model):
     id: str = db.Column(db.Text(), primary_key=True)
-    country: str = db.Column(db.String(100), unique=True, nullable=False)
-    title: str = db.Column(db.String(100), unique=True, nullable=False)
+    country: str = db.Column(db.String(100), nullable=False)
+    title: str = db.Column(db.String(100), nullable=False)
     updated_at: float = db.Column(db.Float, nullable=False)
     created_at: float = db.Column(db.Float, nullable=False)
     achievement_id: str = db.Column(db.Text(), db.ForeignKey('achievement.id'), nullable=False)
@@ -126,7 +126,7 @@ class AchievementCountry(db.Model):
 class Achievement(db.Model):
     id: str = db.Column(db.Text(), primary_key=True)
     year = db.Column(db.Integer, nullable=False)
-    photo_url: str = db.Column(db.String(100), unique=True, nullable=False)
+    photo_url: str = db.Column(db.String(100), nullable=False)
     created_by: str = db.Column(db.Text(), db.ForeignKey('admin.id'), nullable=False)
     updated_at: float = db.Column(db.Float, nullable=False)
     created_at: float = db.Column(db.Float, nullable=False)
@@ -149,8 +149,8 @@ class Achievement(db.Model):
 @dataclass
 class Gallery(db.Model):
     id: str = db.Column(db.Text(), primary_key=True)
-    title: str = db.Column(db.String(100), unique=True, nullable=False)
-    photo_url: str = db.Column(db.String(100), unique=True, nullable=False)
+    title: str = db.Column(db.String(100), nullable=False)
+    photo_url: str = db.Column(db.String(100), nullable=False)
     created_by: str = db.Column(db.Text(), db.ForeignKey('admin.id'), nullable=False)
     updated_at: float = db.Column(db.Float, nullable=False)
     created_at: float = db.Column(db.Float, nullable=False)
