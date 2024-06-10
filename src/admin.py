@@ -93,20 +93,23 @@ def create_user():
     email = request.form.get('email', None)
     phone = request.form.get('phone', None)
     address = request.form.get('address', None)
-    photo = request.form.get('photo', None)
+    photo = request.files.get('photo', None)
     role_id = request.form.get('role_id', None)
     role_text = request.form.get('role_text', None)
     
-    if not name or not password or not email or not phone or not address or not photo:
+    if not name or not password or not email or not phone or not address:
         return jsonify({"msg": "All fields must be provided"}), http.HTTP_400_BAD_REQUEST
     
     # save image to firebase storage
     new_id = str(uuid.uuid4())
-    photo_url = upload_image_to_firebase(photo, file_name=f'photo_profile/{new_id}')
-    if not photo_url[0]:
-        return jsonify({
-            'msg': photo_url[1]
-        }), http.HTTP_500_INTERNAL_SERVER_ERROR
+    photo_url = None
+
+    if photo:
+        photo_url = upload_image_to_firebase(photo, file_name=f'photo_profile/{new_id}')
+        if not photo_url[0]:
+            return jsonify({
+                'msg': photo_url[1]
+            }), http.HTTP_500_INTERNAL_SERVER_ERROR
     
     admin_id = get_jwt_identity()
     admin: Admin = Admin.query.get(admin_id)
@@ -116,12 +119,12 @@ def create_user():
         new_user = User(
             id=new_id,
             name=name,
-            password=generate_password_hash(password),
+            password=generate_password_hash(password, method='pbkdf2'),
             email=email,
             phone=phone,
             address=address,
-            photo_url=photo_url,
-            role_id=role_id,
+            photo_url=photo_url[0],
+            role_id=int(role_id),
             role_text=role_text,
             created_by=admin.id,
             updated_at=created_at,
