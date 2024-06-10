@@ -180,9 +180,6 @@
           "id": {
             "type": "string"
           },
-          "content": {
-            "type": "string"
-          },
           "year": {
             "type": "integer"
           },
@@ -298,24 +295,21 @@
                   "title": {
                     "type": "string"
                   },
-                  "content": {
-                    "type": "string"
-                  },
                   "year": {
                     "type": "integer"
                   },
                   "photo": {
-                    "type": "string"
+                    "type": "file"
                   },
-                  "place": {
+                  "country": {
                     "type": "string"
                   }
                 },
                 "required": [
                   "title",
-                  "content",
                   "year",
-                  "photo"
+                  "photo",
+                  "country"
                 ]
               }
             }
@@ -401,16 +395,13 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "content": {
-                    "type": "string"
-                  },
                   "year": {
                     "type": "integer"
                   },
                   "photo": {
                     "type": "string"
                   },
-                  "place": {
+                  "country": {
                     "type": "string"
                   }
                 }
@@ -804,7 +795,7 @@
                     "type": "string"
                   },
                   "photo": {
-                    "type": "string"
+                    "type": "file"
                   },
                   "role_id": {
                     "type": "string"
@@ -812,7 +803,14 @@
                   "role_text": {
                     "type": "string"
                   }
-                }
+                },
+                "required": [
+                  "name",
+                  "password",
+                  "email",
+                  "phone",
+                  "address"
+                ]
               }
             }
           }
@@ -911,7 +909,7 @@
                     "type": "string"
                   },
                   "photo": {
-                    "type": "string"
+                    "type": "file"
                   },
                   "role_id": {
                     "type": "string"
@@ -1100,10 +1098,13 @@
                     "type": "string"
                   },
                   "photo": {
-                    "type": "string",
-                    "format": "binary"
+                    "type": "file"
                   }
-                }
+                },
+                "required":[
+                  "title",
+                  "photo"
+                ]
               }
             }
           }
@@ -1191,8 +1192,7 @@
                     "type": "string"
                   },
                   "photo": {
-                    "type": "string",
-                    "format": "binary"
+                    "type": "file"
                   }
                 }
               }
@@ -1348,6 +1348,60 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": [
+          "News"
+        ],
+        "summary": "Create a new news article",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  },
+                  "photo": {
+                    "type": "file"
+                  }
+                },
+                "required": [
+                  "title",
+                  "content",
+                  "photo"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "News created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/News"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Title, content, and photo are required"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
       }
     },
     "/news/{news_id}": {
@@ -1383,44 +1437,6 @@
           }
         }
       },
-      "post": {
-        "tags": [
-          "News"
-        ],
-        "summary": "Create a new news article",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "$ref": "#/components/schemas/NewsFormData"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "News created successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/News"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Title, content, and photo are required"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      },
       "put": {
         "tags": [
           "News"
@@ -1446,7 +1462,18 @@
           "content": {
             "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/NewsFormData"
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  },
+                  "photo": {
+                    "type": "file"
+                  }
+                }
               }
             }
           }
@@ -1572,6 +1599,24 @@
           "User"
         ],
         "summary": "User login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
             "description": "Login successful",
@@ -1665,6 +1710,39 @@
             "BearerAuth": []
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "old_password": {
+                    "type": "string"
+                  },
+                  "new_password": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "address": {
+                    "type": "string"
+                  },
+                  "photo": {
+                    "type": "file"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "User updated",
@@ -1866,9 +1944,25 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/EventInput"
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "photo": {
+                    "type": "file"
+                  }
+                },
+                "required": [
+                  "title",
+                  "description",
+                  "photo"
+                ]
               }
             }
           }
@@ -1943,11 +2037,21 @@
           }
         ],
         "requestBody": {
-          "required": true,
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/EventInput"
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "photo": {
+                    "type": "file"
+                  }
+                }
               }
             }
           }
