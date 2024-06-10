@@ -24,13 +24,12 @@ def get_achievements():
 def create_achievement():
     created_by = get_jwt_identity()
     title = request.form.get('title', None)
-    content = request.form.get('content', None)
     year = request.form.get('year', None)
     photo = request.form.get('photo', None)
-    place = request.form.get('place', None)
+    country = request.form.get('country', None)
 
-    if not title or not content or not year or not photo:
-        return jsonify({"msg": "Title, content, year, and photo are required"}), http.HTTP_400_BAD_REQUEST
+    if not title or not year or not photo or not country:
+        return jsonify({"msg": "Title, country, year, and photo are required"}), http.HTTP_400_BAD_REQUEST
     
     new_id = str(uuid.uuid4())
     photo_url = upload_image_to_firebase(photo, file_name=f'achievement/{new_id}')
@@ -43,7 +42,6 @@ def create_achievement():
 
     achievement = Achievement(
         id=new_id,
-        content=content,
         year=year,
         photo_url=photo_url,
         created_by=created_by,
@@ -54,13 +52,13 @@ def create_achievement():
     db.session.add(achievement)
     db.session.commit()
 
-    place = json.loads(place)
+    country = json.loads(country)
 
-    for p in place:
+    for p in country:
         achievement_country = AchievementCountry(
             achievement_id=achievement.id,
             country=p['country'],
-            place=p['title']
+            title=p['title']
         )
 
         db.session.add(achievement_country)
@@ -74,10 +72,9 @@ def create_achievement():
 @achievement.put('/update/<achievement_id>')
 @jwt_required()
 def update_achievement(achievement_id):
-    content = request.form.get('content', None)
     year = request.form.get('year', None)
     photo = request.form.get('photo', None)
-    place = request.form.get('place', None)
+    country = request.form.get('country', None)
 
     achievement: Achievement = Achievement.query.get(achievement_id)
     
@@ -92,7 +89,6 @@ def update_achievement(achievement_id):
             else:
                 achievement.photo_url = photo_url[0]
         
-        if content: achievement.content = content
         if year: achievement.year = year
 
         db.session.commit()
@@ -102,13 +98,13 @@ def update_achievement(achievement_id):
         db.session.commit()
 
         # add new achievement country
-        place = json.loads(place)
+        country = json.loads(country)
 
-        for p in place:
+        for p in country:
             achievement_country = AchievementCountry(
                 achievement_id=achievement.id,
                 country=p['country'],
-                place=p['title']
+                title=p['title']
             )
 
             db.session.add(achievement_country)

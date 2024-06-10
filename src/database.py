@@ -125,7 +125,6 @@ class AchievementCountry(db.Model):
 @dataclass
 class Achievement(db.Model):
     id: str = db.Column(db.Text(), primary_key=True)
-    content: str = db.Column(db.Text(), nullable=False)
     year = db.Column(db.Integer, nullable=False)
     photo_url: str = db.Column(db.String(100), unique=True, nullable=False)
     created_by: str = db.Column(db.Text(), db.ForeignKey('admin.id'), nullable=False)
@@ -141,7 +140,6 @@ class Achievement(db.Model):
         return {
             "id": self.id,
             "year": self.year,
-            "content": self.content,
             "photo_url": self.photo_url,
             "updated_at": self.updated_at,
             "created_at": self.created_at,
