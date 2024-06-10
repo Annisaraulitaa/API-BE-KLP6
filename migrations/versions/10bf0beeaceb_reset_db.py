@@ -1,8 +1,8 @@
-"""init
+"""reset db
 
-Revision ID: 7cfc6321b1f2
+Revision ID: 10bf0beeaceb
 Revises: 
-Create Date: 2024-06-10 09:57:10.168499
+Create Date: 2024-06-10 23:29:47.928867
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '7cfc6321b1f2'
+revision = '10bf0beeaceb'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -29,15 +29,13 @@ def upgrade():
     )
     op.create_table('achievement',
     sa.Column('id', sa.Text(), nullable=False),
-    sa.Column('content', sa.Text(), nullable=False),
     sa.Column('year', sa.Integer(), nullable=False),
     sa.Column('photo_url', sa.String(length=100), nullable=False),
     sa.Column('created_by', sa.Text(), nullable=False),
     sa.Column('updated_at', sa.Float(), nullable=False),
     sa.Column('created_at', sa.Float(), nullable=False),
     sa.ForeignKeyConstraint(['created_by'], ['admin.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('photo_url')
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('event',
     sa.Column('id', sa.Text(), nullable=False),
@@ -48,9 +46,7 @@ def upgrade():
     sa.Column('updated_at', sa.Float(), nullable=False),
     sa.Column('created_at', sa.Float(), nullable=False),
     sa.ForeignKeyConstraint(['created_by'], ['admin.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('photo_url'),
-    sa.UniqueConstraint('title')
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('gallery',
     sa.Column('id', sa.Text(), nullable=False),
@@ -60,9 +56,7 @@ def upgrade():
     sa.Column('updated_at', sa.Float(), nullable=False),
     sa.Column('created_at', sa.Float(), nullable=False),
     sa.ForeignKeyConstraint(['created_by'], ['admin.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('photo_url'),
-    sa.UniqueConstraint('title')
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('news',
     sa.Column('id', sa.Text(), nullable=False),
@@ -73,9 +67,7 @@ def upgrade():
     sa.Column('updated_at', sa.Float(), nullable=False),
     sa.Column('created_at', sa.Float(), nullable=False),
     sa.ForeignKeyConstraint(['created_by'], ['admin.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('photo_url'),
-    sa.UniqueConstraint('title')
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('user',
     sa.Column('id', sa.Text(), nullable=False),
@@ -85,18 +77,13 @@ def upgrade():
     sa.Column('phone', sa.String(length=100), nullable=False),
     sa.Column('address', sa.String(length=100), nullable=False),
     sa.Column('photo_url', sa.String(length=100), nullable=True),
-    sa.Column('role_id', sa.Text(), nullable=True),
+    sa.Column('role_id', sa.Integer(), nullable=True),
     sa.Column('role_text', sa.String(length=100), nullable=True),
     sa.Column('created_by', sa.Text(), nullable=False),
     sa.Column('updated_at', sa.Float(), nullable=False),
     sa.Column('created_at', sa.Float(), nullable=False),
     sa.ForeignKeyConstraint(['created_by'], ['admin.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('address'),
-    sa.UniqueConstraint('email'),
-    sa.UniqueConstraint('name'),
-    sa.UniqueConstraint('phone'),
-    sa.UniqueConstraint('photo_url')
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('achievement_country',
     sa.Column('id', sa.Text(), nullable=False),
@@ -106,9 +93,7 @@ def upgrade():
     sa.Column('created_at', sa.Float(), nullable=False),
     sa.Column('achievement_id', sa.Text(), nullable=False),
     sa.ForeignKeyConstraint(['achievement_id'], ['achievement.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('country'),
-    sa.UniqueConstraint('title')
+    sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
 
