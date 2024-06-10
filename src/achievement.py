@@ -7,11 +7,11 @@ import src.constants.http_status_codes as http
 from flask import Blueprint, json, jsonify, request
 from src.database import Achievement, AchievementCountry, db
 from src.utils.upload_image_to_firebase import upload_image_to_firebase
+from flasgger import swag_from
 
 achievement = Blueprint('achievement', __name__)
 
 @achievement.get('/')
-# without pagination
 def get_achievements():
     achievements: List[Achievement] = Achievement.query.all()
 
