@@ -8,6 +8,7 @@ from flask_migrate import Migrate
 from src.admin import admin, create_default_admin
 from src.user import user
 from src.structure import structure
+from src.news import news
 
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
@@ -37,6 +38,7 @@ def create_app(test_config=None):
     app.register_blueprint(admin, url_prefix='/api/v1/admin')
     app.register_blueprint(user, url_prefix='/api/v1/user')
     app.register_blueprint(structure, url_prefix='/api/v1/structure')
+    app.register_blueprint(news, url_prefix='/api/v1/news')
 
     # Swagger(app, template=template, config=swagger_config)
 
