@@ -118,18 +118,13 @@ class AchievementCountry(db.Model):
     
     def to_dict(self):
         return {
-            "id": self.id,
             "country": self.country,
             "title": self.title,
-            "updated_at": self.updated_at,
-            "created_at": self.created_at,
-            "achievement_id": self.achievement_id
         }
 
 @dataclass
 class Achievement(db.Model):
     id: str = db.Column(db.Text(), primary_key=True)
-    title: str = db.Column(db.String(100), unique=True, nullable=False)
     content: str = db.Column(db.Text(), nullable=False)
     year = db.Column(db.Integer, nullable=False)
     photo_url: str = db.Column(db.String(100), unique=True, nullable=False)
@@ -140,14 +135,13 @@ class Achievement(db.Model):
     countries = db.relationship('AchievementCountry', back_populates='achievement', cascade='all, delete-orphan')
 
     def __repr(self) -> str:
-        return f"<Achievement {self.title}>"
+        return f"<Achievement {self.id}>"
     
     def to_dict(self):
         return {
             "id": self.id,
-            "title": self.title,
-            "content": self.content,
             "year": self.year,
+            "content": self.content,
             "photo_url": self.photo_url,
             "updated_at": self.updated_at,
             "created_at": self.created_at,
