@@ -16,6 +16,7 @@ from src.config.swagger import swagger_config, template
 from src.token import token
 from src.event import event
 from flask_swagger_ui import get_swaggerui_blueprint # type: ignore
+from flask_cors import CORS # type: ignore
 
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
@@ -33,6 +34,9 @@ def create_app(test_config=None):
         )
     else:
         app.config.from_mapping(test_config)
+
+    # Enable CORS for all routes
+    CORS(app)
 
     # swagger config
     SWAGGER_URL = '/swagger'
