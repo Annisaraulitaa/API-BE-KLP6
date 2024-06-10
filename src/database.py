@@ -31,7 +31,7 @@ class User(db.Model):
     email = db.Column(db.String(100), unique=True, nullable=False)
     phone = db.Column(db.String(100), unique=True, nullable=False)
     address = db.Column(db.String(100), unique=True, nullable=False)
-    photo_url = db.Column(db.String(100), unique=True, nullable=False)
+    photo_url = db.Column(db.String(100), unique=True, nullable=True)
     role_id = db.Column(db.Text(), nullable=True)
     role_text = db.Column(db.String(100), nullable=True)
     # add foreign key 'created_by' to Admin
