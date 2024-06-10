@@ -9,6 +9,7 @@ charset-normalizer
 click
 cryptography
 firebase-admin
+flask-swagger-ui
 flasgger
 Flask
 Flask-JWT-Extended
