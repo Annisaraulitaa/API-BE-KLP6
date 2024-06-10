@@ -10,6 +10,7 @@ from src.user import user
 from src.structure import structure
 from src.news import news
 from src.achievement import achievement
+from src.gallery import gallery
 
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
@@ -41,6 +42,7 @@ def create_app(test_config=None):
     app.register_blueprint(structure, url_prefix='/api/v1/structure')
     app.register_blueprint(news, url_prefix='/api/v1/news')
     app.register_blueprint(achievement, url_prefix='/api/v1/achievement')
+    app.register_blueprint(gallery, url_prefix='/api/v1/gallery')
 
     # Swagger(app, template=template, config=swagger_config)
 
