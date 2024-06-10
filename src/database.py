@@ -147,3 +147,24 @@ class Achievement(db.Model):
             "created_at": self.created_at,
             "countries": [country.to_dict() for country in self.countries]
         }
+
+@dataclass
+class Gallery(db.Model):
+    id: str = db.Column(db.Text(), primary_key=True)
+    title: str = db.Column(db.String(100), unique=True, nullable=False)
+    photo_url: str = db.Column(db.String(100), unique=True, nullable=False)
+    created_by: str = db.Column(db.Text(), db.ForeignKey('admin.id'), nullable=False)
+    updated_at: float = db.Column(db.Float, nullable=False)
+    created_at: float = db.Column(db.Float, nullable=False)
+
+    def __repr(self) -> str:
+        return f"<Gallery {self.title}>"
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "photo_url": self.photo_url,
+            "updated_at": self.updated_at,
+            "created_at": self.created_at
+        }
