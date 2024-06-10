@@ -1,9 +1,8 @@
 from datetime import datetime
-import uuid
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required
 import src.constants.http_status_codes as http
 from flask import Blueprint, jsonify, request
-from src.database import User, db, Admin
+from src.database import User, db
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from src.utils.upload_image_to_firebase import upload_image_to_firebase
