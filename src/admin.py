@@ -3,8 +3,10 @@ import uuid
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required
 import src.constants.http_status_codes as http
 from flask import Blueprint, jsonify, request
-from src.database import db, Admin
+from src.database import User, db, Admin
 from werkzeug.security import check_password_hash, generate_password_hash
+
+from src.utils.upload_image_to_firebase import upload_image_to_firebase
 
 admin = Blueprint('admin', __name__)
 
@@ -60,7 +62,7 @@ def register():
 
     return jsonify({
         "msg": "Admin created successfully",
-        "admin": new_admin.to_dict()
+        "data": new_admin.to_dict()
     }), http.HTTP_201_CREATED
 
 @admin.put('/change-password')
@@ -82,6 +84,114 @@ def change_password():
             return jsonify({"msg": "Password changed successfully"}), http.HTTP_200_OK
 
     return jsonify({"msg": "Invalid current password"}), http.HTTP_401_UNAUTHORIZED
+
+@admin.post('/create-user')
+@jwt_required()
+def create_user():
+    name = request.form.get('name', None)
+    password = request.form.get('password', None)
+    email = request.form.get('email', None)
+    phone = request.form.get('phone', None)
+    address = request.form.get('address', None)
+    photo = request.form.get('photo', None)
+    role_id = request.form.get('role_id', None)
+    role_text = request.form.get('role_text', None)
+    
+    if not name or not password or not email or not phone or not address or not photo:
+        return jsonify({"msg": "All fields must be provided"}), http.HTTP_400_BAD_REQUEST
+    
+    # save image to firebase storage
+    new_id = str(uuid.uuid4())
+    photo_url = upload_image_to_firebase(photo, file_name=f'photo_profile/{new_id}')
+    if not photo_url[0]:
+        return jsonify({
+            'msg': photo_url[1]
+        }), http.HTTP_500_INTERNAL_SERVER_ERROR
+    
+    admin_id = get_jwt_identity()
+    admin: Admin = Admin.query.get(admin_id)
+
+    if admin:
+        created_at = datetime.now().timestamp() * 1000
+        new_user = User(
+            id=new_id,
+            name=name,
+            password=generate_password_hash(password),
+            email=email,
+            phone=phone,
+            address=address,
+            photo_url=photo_url,
+            role_id=role_id,
+            role_text=role_text,
+            created_by=admin.id,
+            updated_at=created_at,
+            created_at=created_at
+        )
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        return jsonify({
+            "msg": "User created successfully",
+            "data": new_user.to_dict()
+        }), http.HTTP_201_CREATED
+
+    return jsonify({"msg": "Invalid admin"}), http.HTTP_401_UNAUTHORIZED
+
+@admin.put('/update-user/<user_id>')
+@jwt_required()
+def update_user(user_id):
+    name = request.form.get('name', None)
+    email = request.form.get('email', None)
+    phone = request.form.get('phone', None)
+    address = request.form.get('address', None)
+    photo = request.form.get('photo', None)
+    role_id = request.form.get('role_id', None)
+    role_text = request.form.get('role_text', None)
+    
+    user: User = User.query.get(user_id)
+
+    if user:
+        if photo:
+            # save image to firebase storage
+            photo_url = upload_image_to_firebase(photo, file_name=f'photo_profile/{user_id}')
+            if not photo_url[0]:
+                return jsonify({
+                    'msg': photo_url[1]
+                }), http.HTTP_500_INTERNAL_SERVER_ERROR
+            else:
+                user.photo_url = photo_url[0]
+
+
+        if name: user.name = name
+        if email: user.email = email
+        if phone: user.phone = phone
+        if address: user.address = address
+        if role_id: user.role_id = role_id
+        if role_text: user.role_text = role_text
+        user.updated_at = datetime.now().timestamp() * 1000
+
+        db.session.commit()
+
+        return jsonify({
+            "msg": "User updated successfully",
+            "data": user.to_dict()
+        }), http.HTTP_200_OK
+
+    return jsonify({"msg": "User not found"}), http.HTTP_404_NOT_FOUND
+
+@admin.delete('/delete-user/<user_id>')
+@jwt_required()
+def delete_user(user_id):
+    user: User = User.query.get(user_id)
+
+    if user:
+        db.session.delete(user)
+        db.session.commit()
+
+        return jsonify({"msg": "User deleted successfully"}), http.HTTP_200_OK
+
+    return jsonify({"msg": "User not found"}), http.HTTP_404_NOT_FOUND
 
 # a function that will create one default admin and will be called when the app is first run
 def create_default_admin():
