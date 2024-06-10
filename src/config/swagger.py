@@ -1,5 +1,6 @@
 template = {
     "swagger": "2.0",
+    # "openapi": "3.0.0",
     "info": {
         "title": "PSM API",
         "description": "API for PSM project",

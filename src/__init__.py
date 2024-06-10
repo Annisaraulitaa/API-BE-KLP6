@@ -14,6 +14,8 @@ from src.gallery import gallery
 from src.home import home
 from src.config.swagger import swagger_config, template
 from src.token import token
+from src.event import event
+from flask_swagger_ui import get_swaggerui_blueprint # type: ignore
 
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
@@ -24,13 +26,26 @@ def create_app(test_config=None):
             SQLALCHEMY_DATABASE_URI=os.environ.get("SQLALCHEMY_DB_URI"),
             SQLALCHEMY_TRACK_MODIFICATIONS=False,
             JWT_SECRET_KEY=os.environ.get("JWT_SECRET_KEY"),
-            SWAGGER={
-                'title': "PSM API",
-                'uiversion': 3,
-            }
+            # SWAGGER={
+            #     'title': "PSM API",
+            #     'uiversion': 3,
+            # }
         )
     else:
         app.config.from_mapping(test_config)
+
+    # swagger config
+    SWAGGER_URL = '/swagger'
+    API_URL = '/static/swagger.json'
+    SWAGGER_BLUEPRINT = get_swaggerui_blueprint(
+        SWAGGER_URL,
+        API_URL,
+        config={
+            'app_name': 'PSM API'
+        }
+    )
+
+    app.register_blueprint(SWAGGER_BLUEPRINT, url_prefix=SWAGGER_URL)
 
     JWTManager(app)
 
@@ -48,6 +63,7 @@ def create_app(test_config=None):
     app.register_blueprint(gallery, url_prefix='/api/v1/gallery')
     app.register_blueprint(home, url_prefix='/api/v1/home')
     app.register_blueprint(token, url_prefix='/api/v1/token')
+    app.register_blueprint(event, url_prefix='/api/v1/event')
 
     Swagger(app, template=template, config=swagger_config)
 
