@@ -9,7 +9,6 @@ from src.utils.upload_image_to_firebase import upload_image_to_firebase
 gallery = Blueprint('gallery', __name__)
 
 @gallery.get('/')
-# implement pagination
 def get_gallery():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)

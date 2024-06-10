@@ -9,7 +9,6 @@ import src.constants.http_status_codes as http
 home = Blueprint('home', __name__)
 
 @home.get('/')
-# return 4 gallery, 2 news, AchievementCountry country and title count, and user count
 def get_home():
     gallery: List[Gallery] = Gallery.query.limit(4).all()
     gallery_data = [g.to_dict() for g in gallery]

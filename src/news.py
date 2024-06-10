@@ -10,7 +10,6 @@ from src.utils.upload_image_to_firebase import upload_image_to_firebase
 news = Blueprint('news', __name__)
 
 @news.get('/')
-# get all news but implement pagination
 def get_news():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
