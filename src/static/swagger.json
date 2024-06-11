@@ -1914,7 +1914,7 @@
         }
       }
     },
-    "/event": {
+    "/event/": {
       "get": {
         "tags": [
           "Event"
