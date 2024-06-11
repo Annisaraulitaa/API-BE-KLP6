@@ -127,7 +127,7 @@ def create_user():
             email=email,
             phone=phone,
             address=address,
-            photo_url=photo_url[0],
+            photo_url=photo_url[0] if photo_url else None,
             role_id=role_id,
             role_text=role_text,
             created_by=admin.id,
