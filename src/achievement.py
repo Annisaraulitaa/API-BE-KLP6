@@ -53,8 +53,8 @@ def create_achievement():
     db.session.add(achievement)
 
     country = json.loads(country)
-    achievement_country_id = str(uuid.uuid4())
     for p in country:
+        achievement_country_id = str(uuid.uuid4())
         achievement_country = AchievementCountry(
             id=achievement_country_id,
             achievement_id=achievement.id,
