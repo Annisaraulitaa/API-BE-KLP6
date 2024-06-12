@@ -80,7 +80,7 @@ def create_news():
 def update_news(news_id):
     title = request.form.get('title', None)
     content = request.form.get('content', None)
-    photo = request.form.get('photo', None)
+    photo = request.files.get('photo', None)
     
     news: News = News.query.get(news_id)
     

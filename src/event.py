@@ -64,7 +64,7 @@ def create():
 def update(id):
     title = request.form.get('title', None)
     content = request.form.get('content', None)
-    photo = request.form.get('photo', None)
+    photo = request.files.get('photo', None)
     
     event: Event = Event.query.get(id)
     

@@ -152,7 +152,7 @@ def update_user(user_id):
     email = request.form.get('email', None)
     phone = request.form.get('phone', None)
     address = request.form.get('address', None)
-    photo = request.form.get('photo', None)
+    photo = request.files.get('photo', None)
     role_id = request.form.get('role_id', None)
     role_text = request.form.get('role_text', None)
     
